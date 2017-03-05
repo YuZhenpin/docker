@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.5
 
 # Setup demo environment variables
 ENV HOME=/root \
@@ -10,8 +10,12 @@ ENV HOME=/root \
 	DISPLAY_WIDTH=1024 \
 	DISPLAY_HEIGHT=768
 
-# x11vnc is in testing repo
-RUN echo "http://dl-3.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+# x11vnc apk
+ADD /apk /apk
+RUN cp /apk/.abuild/-58b7ee0c.rsa.pub /etc/apk/keys
+RUN apk --update add /apk/ossp-uuid-1.6.2-r0.apk
+RUN apk add /apk/ossp-uuid-dev-1.6.2-r0.apk
+RUN apk add /apk/x11vnc-0.9.13-r0.apk
 
 # Install git, supervisor, VNC, & X11 packages
 RUN apk --update --upgrade add \
@@ -20,9 +24,9 @@ RUN apk --update --upgrade add \
 	git \
 	socat \
 	supervisor \
-	x11vnc \
 	xterm \
-	xvfb
+	xvfb \
+	x11vnc
 
 # Clone noVNC from github
 RUN git clone https://github.com/YuZhenpin/noVNC.git /root/noVNC \
